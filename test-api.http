@@ -1,0 +1,23 @@
+### ATTENDANCE LOGIN
+
+POST http://localhost:5000/activity-log/login
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoic2FsZXNAdHJ5Z2V0dmlzYS5jb20iLCJyb2xlIjoiU0FMRVNfRVhFQ1VUSVZFIiwiaWF0IjoxNzc5ODIyMTUyLCJleHAiOjE3ODA0MjY5NTJ9.xHs9zPvq3XE8qnhC3azqGPY8bV6NkNenGnt-U99nhsE
+
+{
+  "note": "Started office work"
+}
+
+
+### SALES FOLLOW UP
+
+POST http://localhost:5000/leads/1/sales-follow-up
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoic2FsZXNAdHJ5Z2V0dmlzYS5jb20iLCJyb2xlIjoiU0FMRVNfRVhFQ1VUSVZFIiwiaWF0IjoxNzc5ODIyMTUyLCJleHAiOjE3ODA0MjY5NTJ9.xHs9zPvq3XE8qnhC3azqGPY8bV6NkNenGnt-U99nhsE
+
+{
+  "notes": "Customer payment completed. Ready to move to process team.",
+  "disposition": "PAYMENT_DONE",
+  "status": "PAYMENT_DONE",
+  "nextFollowUpDate": "2026-05-28"
+}

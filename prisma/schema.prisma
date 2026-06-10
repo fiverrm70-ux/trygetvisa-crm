@@ -1,0 +1,211 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  LEADS_EXECUTIVE
+  SALES_EXECUTIVE
+  PROCESS_EXECUTIVE
+  CLIENT
+}
+
+enum LeadStatus {
+  NEW
+  ASSIGNED_TO_SALES
+  FOLLOW_UP
+  CALL_BACK
+  PAYMENT_DONE
+  SALE_COMPLETED
+  ASSIGNED_TO_PROCESS
+  PROCESS_RUNNING
+  PROCESS_COMPLETED
+}
+
+enum ActivityType {
+  LOGIN
+  BREAK_START
+  BREAK_END
+  LUNCH_START
+  LUNCH_END
+  LOGOUT
+}
+
+enum DocumentStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum ProcessDoneStatus {
+  PENDING
+  YES
+  NO
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  name      String
+  email     String  @unique
+  password  String
+  phone     String?
+  role      Role
+  isActive  Boolean @default(true)
+
+  createdLeads         Lead[] @relation("CreatedLeads")
+  assignedSalesLeads   Lead[] @relation("AssignedSalesLeads")
+  assignedProcessLeads Lead[] @relation("AssignedProcessLeads")
+  clientLeads          Lead[] @relation("ClientLeads")
+
+  salesFollowUps         SalesFollowUp[]
+  processUpdateHistories ProcessUpdateHistory[]
+  processDocuments       ProcessDocument[]
+  activities             ActivityLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id Int @id @default(autoincrement())
+
+  fullName       String
+  contactNo      String
+  email          String?
+  alternateEmail String?
+
+  dob           DateTime?
+  maritalStatus String?
+  marriageDate  DateTime?
+
+  educationLevel  String?
+  educationCourse String?
+
+  job               String?
+  yearsOfExperience String?
+  business          String?
+
+  city String?
+
+  countryApplying    String?
+  schengenCountry    String?
+  nonSchengenCountry String?
+
+  visaType String?
+
+  applyingWithSpouse String?
+
+  spouseDob             DateTime?
+  spouseEducationStatus String?
+  spouseWorkExperience  String?
+
+  processingFees Float?
+  amountPaid     Float?
+  amountPending  Float?
+
+  visaCopy   String?
+  visaStatus String?
+
+  adminComment String?
+
+  processDoneStatus ProcessDoneStatus @default(PENDING)
+
+  status LeadStatus @default(NEW)
+
+  createdById         Int?
+  assignedToSalesId   Int?
+  assignedToProcessId Int?
+  clientId            Int?
+
+  createdBy         User? @relation("CreatedLeads", fields: [createdById], references: [id])
+  assignedToSales   User? @relation("AssignedSalesLeads", fields: [assignedToSalesId], references: [id])
+  assignedToProcess User? @relation("AssignedProcessLeads", fields: [assignedToProcessId], references: [id])
+  client            User? @relation("ClientLeads", fields: [clientId], references: [id])
+
+  followUps              SalesFollowUp[]
+  processDocuments       ProcessDocument[]
+  processUpdateHistories ProcessUpdateHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SalesFollowUp {
+  id Int @id @default(autoincrement())
+
+  leadId      Int
+  salesUserId Int
+
+  disposition      String
+  notes            String?
+  nextFollowUpDate DateTime?
+
+  lead      Lead @relation(fields: [leadId], references: [id])
+  salesUser User @relation(fields: [salesUserId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model ProcessDocument {
+  id Int @id @default(autoincrement())
+
+  leadId        Int
+  processUserId Int
+
+  documentName String
+  fileUrl      String?
+  status       DocumentStatus @default(PENDING)
+  remarks      String?
+
+  lead        Lead @relation(fields: [leadId], references: [id])
+  processUser User @relation(fields: [processUserId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([leadId, documentName])
+}
+
+model ProcessUpdateHistory {
+  id Int @id @default(autoincrement())
+
+  leadId        Int
+  processUserId Int
+
+  status            LeadStatus
+  processDoneStatus ProcessDoneStatus @default(PENDING)
+  notes             String?
+
+  lead        Lead @relation(fields: [leadId], references: [id])
+  processUser User @relation(fields: [processUserId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id     Int          @id @default(autoincrement())
+  type   ActivityType
+  note   String?
+  userId Int
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Holiday {
+  id          Int      @id @default(autoincrement())
+  title       String
+  date        DateTime
+  description String?
+  year        Int
+  isActive    Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
